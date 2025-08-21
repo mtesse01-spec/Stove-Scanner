@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>📷 Stove Scanner</title>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+</head>
+<body>
+  <h2>📷 Stove Scanner</h2>
+  <div id="reader" style="width:300px;"></div>
+  <p id="result"></p>
+
+  <script>
+    function onScanSuccess(decodedText, decodedResult) {
+      document.getElementById("result").innerText = `Scanned: ${decodedText}`;
+      
+      // send scanned data to Google Apps Script
+      fetch("https://script.google.com/macros/s/AKfycbz8sptGvvru4oyU-xSBNCqW92TFAVkrxupA1aNRny0H5IKVIU5G9EBpYHk-Un5z6QVI/exec", {
+        method: "POST",
+        body: JSON.stringify({ StoveID: decodedText }),
+        headers: { "Content-Type": "application/json" }
+      }).then(res => res.json())
+        .then(data => console.log("Success:", data))
+        .catch(err => console.error("Error:", err));
+    }
+
+    function onScanError(errorMessage) {
+      console.warn(`Error: ${errorMessage}`);
+    }
+
+    let html5QrcodeScanner = new Html5QrcodeScanner(
+      "reader", { fps: 10, qrbox: 250 });
+    html5QrcodeScanner.render(onScanSuccess, onScanError);
+  </script>
+</body>
+</html>
